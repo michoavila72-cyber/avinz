@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 400px; margin: 3rem auto;">
+    <div class="card" style="animation: fadeInUp 0.6s ease-out;">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%); 
+                    border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: white; font-size: 2rem;">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h2 style="color: var(--primary-blue);">Register New Account</h2>
+            <p style="color: var(--gray-700);">Create a new administrator account</p>
+        </div>
+        
+        {% if error %}
+        <div style="background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 1.5rem; 
+                    display: flex; align-items: center; gap: 10px; animation: fadeIn 0.3s ease-out;">
+            <i class="fas fa-exclamation-triangle"></i>
+            {{ error }}
+        </div>
+        {% endif %}
+        
+        <form action="{{ url_for('register') }}" method="POST">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-envelope"></i> Email Address
+                </label>
+                <input type="email" name="email" class="form-control" 
+                       value="{{ request.form.email if request.form else '' }}" 
+                       placeholder="admin@university.edu" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-lock"></i> Password
+                </label>
+                <input type="password" name="password" class="form-control" 
+                       placeholder="Enter your password" required>
+                <div style="font-size: 0.8rem; color: var(--gray-700); margin-top: 5px;">
+                    Must be at least 6 characters
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-lock"></i> Confirm Password
+                </label>
+                <input type="password" name="confirm_password" class="form-control" 
+                       placeholder="Confirm your password" required>
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem;">
+                    <i class="fas fa-user-plus"></i> REGISTER ACCOUNT
+                </button>
+            </div>
+        </form>
+        
+        <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
+            <p style="color: var(--gray-700); margin-bottom: 1rem;">Already have an account?</p>
+            <a href="{{ url_for('login') }}" class="btn btn-success" style="width: 100%;">
+                <i class="fas fa-sign-in-alt"></i> LOGIN TO EXISTING ACCOUNT
+            </a>
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 1.5rem; color: var(--gray-700); font-size: 0.9rem;">
+        <i class="fas fa-info-circle"></i> Contact system administrator for account issues
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-blue: #3498db;
+        --dark-blue: #2980b9;
+        --gray-700: #4a5568;
+        --gray-200: #e2e8f0;
+    }
+    
+    .card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        border: 1px solid #e1e8ed;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--gray-700);
+        font-size: 0.95rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e1e8ed;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-blue);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--dark-blue);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(52, 152, 219, 0.3);
+    }
+    
+    .btn-success {
+        background-color: #27ae60;
+        color: white;
+    }
+    
+    .btn-success:hover {
+        background-color: #219653;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(39, 174, 96, 0.3);
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+</style>
+{% endblock %}

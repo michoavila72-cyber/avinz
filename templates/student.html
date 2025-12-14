@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="w3-container" style="max-width:600px; margin:auto; margin-top:30px;">
+    <div class="w3-card-4 w3-padding w3-round-large">
+        <h3 class="w3-center">{{ student and 'Edit Student' or 'Add Student' }}</h3>
+        <form action="{{ student and url_for('edit_student_page', student_id=student.id) or url_for('add_student_page') }}" method="POST" enctype="multipart/form-data">
+
+            <!-- CAMERA AND SELFIE DISPLAY SIDE BY SIDE -->
+            <div class="w3-row" style="margin-bottom: 20px;">
+                <!-- LEFT: Camera View -->
+                <div class="w3-col s6 w3-center" style="padding: 10px;">
+                    <div style="border: 2px dashed #3498db; border-radius: 10px; padding: 10px; background: #f8f9fa;">
+                        <h4 style="color: #3498db; margin: 0 0 10px 0;">
+                            <i class="fas fa-camera"></i> Camera
+                        </h4>
+                        <video id="camera" width="200" height="200" autoplay
+                               style="border-radius: 10px; object-fit: cover; border: 2px solid #3498db; background: #000;"></video>
+                        <br>
+                        <button type="button" class="w3-button w3-blue w3-round" onclick="snapPhoto()" style="margin-top: 10px;">
+                            <i class="fas fa-camera"></i> Take Selfie
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- RIGHT: Selfie Result -->
+                <div class="w3-col s6 w3-center" style="padding: 10px;">
+                    <div style="border: 2px dashed #27ae60; border-radius: 10px; padding: 10px; background: #f8f9fa;">
+                        <h4 style="color: #27ae60; margin: 0 0 10px 0;">
+                            <i class="fas fa-image"></i> Selfie Result
+                        </h4>
+                        <img id="avatarPreview" src="{{ url_for('static', filename='images/' ~ (student.avatar if student and student.avatar else 'default_avatar.png')) }}" 
+                             style="width: 200px; height: 200px; border-radius: 10px; object-fit: cover; border: 2px solid #27ae60; background: #fff;">
+                        <p style="margin-top: 10px; font-size: 0.9rem; color: #777;">
+                            Your photo will appear here
+                        </p>
+                    </div>
+                    <input type="hidden" name="avatar" id="avatarData">
+                </div>
+            </div>
+
+            <!-- STUDENT INFORMATION FORM -->
+            <input id="idnoInput" class="w3-input w3-border w3-round-large" type="text" name="idno" placeholder="ID Number" value="{{ student.idno if student else '' }}" required><br>
+            <input class="w3-input w3-border w3-round-large" type="text" name="lastname" placeholder="Last Name" value="{{ student.lastname if student else '' }}" required><br>
+            <input class="w3-input w3-border w3-round-large" type="text" name="firstname" placeholder="First Name" value="{{ student.firstname if student else '' }}" required><br>
+            <select class="w3-select w3-border w3-round-large" name="course" required>
+                        <option value="" disabled selected>Course</option>
+                        <option value="BSIT" {% if student and student.course == 'BSIT' %}selected{% endif %}>BSIT</option>
+                        <option value="BSCS" {% if student and student.course == 'BSCS' %}selected{% endif %}>BSCS</option>
+                        <option value="BSCPE" {% if student and student.course == 'BSCPE' %}selected{% endif %}>BSCPE</option>
+                        <option value="BSHM" {% if student and student.course == 'BSHM' %}selected{% endif %}>BSHM</option>
+                        <option value="BSCJ" {% if student and student.course == 'BSCJ' %}selected{% endif %}>BSCJ</option>
+                    </select><br><br>
+            <select class="w3-select w3-border w3-round-large" name="level" required>
+                        <option value="" disabled selected>Level</option>
+                        <option value="1" {% if student and student.level == '1' %}selected{% endif %}>1</option>
+                        <option value="2" {% if student and student.level == '2' %}selected{% endif %}>2</option>
+                        <option value="3" {% if student and student.level == '3' %}selected{% endif %}>3</option>
+                        <option value="4" {% if student and student.level == '4' %}selected{% endif %}>4</option>
+                    </select><br><br>
+
+            <!-- QR CODE DISPLAY -->
+            <div class="w3-container w3-center" style="margin-top:15px;">
+                <h4 style="color: #2c3e50; margin-bottom: 10px;">
+                    <i class="fas fa-qrcode"></i> Student QR Code
+                </h4>
+                <canvas id="qrcode" style="border: 2px solid #eee; border-radius: 5px; padding: 10px;"></canvas>
+                <p style="font-size: 0.9rem; color: #777; margin-top: 10px;">
+                    This QR code will be used for attendance scanning
+                </p>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="w3-row" style="margin-top:20px;">
+                <div class="w3-col s6">
+                    <a href="{{ url_for('student_mngt') }}" class="w3-button w3-red w3-block w3-round">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+                <div class="w3-col s6">
+                    <button type="submit" class="w3-button w3-green w3-block w3-round">
+                        <i class="fas fa-save"></i> {{ student and 'Update' or 'Save' }}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/qrcode.min.js') }}"></script>
+
+<script>
+function generateQRCode() {
+    const idno = document.getElementById("idnoInput").value;
+    const qrCanvas = document.getElementById("qrcode");
+    const ctx = qrCanvas.getContext('2d');
+    ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
+
+    if (idno) {
+        QRCode.toCanvas(qrCanvas, idno, { width: 200, margin: 2 }, function(err) {
+            if (err) console.error(err);
+        });
+    }
+}
+document.getElementById("idnoInput").addEventListener("input", generateQRCode);
+window.addEventListener("load", generateQRCode);
+
+// Camera setup
+const video = document.getElementById('camera');
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+            video.play();
+        })
+        .catch(err => {
+            console.error("Camera error: ", err);
+            // Show message if camera fails
+            document.getElementById('camera').style.display = 'none';
+            document.querySelector('.w3-col.s6:first-child').innerHTML += 
+                '<p style="color: #e74c3c; margin-top: 10px;">Camera access denied. Please allow camera access to take a selfie.</p>';
+        });
+}
+
+function snapPhoto() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 200;
+    canvas.height = 200;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    const dataURL = canvas.toDataURL('image/png');
+    document.getElementById('avatarPreview').src = dataURL;
+    document.getElementById('avatarData').value = dataURL;
+    
+    // Add success message
+    const previewDiv = document.querySelector('.w3-col.s6:last-child p');
+    previewDiv.innerHTML = '<i class="fas fa-check-circle" style="color: #27ae60;"></i> Selfie captured successfully!';
+    previewDiv.style.color = '#27ae60';
+    previewDiv.style.fontWeight = '600';
+}
+
+// Auto-generate QR code on page load if IDNO exists
+window.addEventListener('load', function() {
+    const idnoInput = document.getElementById('idnoInput');
+    if (idnoInput && idnoInput.value) {
+        generateQRCode();
+    }
+});
+</script>
+
+<style>
+    /* Make sure both camera and preview are same size */
+    #camera, #avatarPreview {
+        width: 200px !important;
+        height: 200px !important;
+        object-fit: cover !important;
+    }
+    
+    /* Style the headers */
+    h4 {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    
+    /* Add some spacing */
+    .w3-row {
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}

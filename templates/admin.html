@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="dashboard">
+    
+    <div class="top-row-container" style="display: flex; gap: 20px;"> 
+        
+        <div class="sidebar" style="flex: 0 0 250px;"> 
+            <h3 style="color: var(--primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-tachometer-alt"></i> Control Panel
+            </h3>
+            
+            <div style="margin-bottom: 2rem;">
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #f1f5f9; border-radius: 10px; margin-bottom: 1rem;">
+                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600;">{{ session.user }}</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Administrator</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav>
+                <a href="{{ url_for('admin') }}" class="nav-link {% if request.path == url_for('admin') %}active{% endif %}">
+                    <i class="fas fa-users-cog"></i> User Management
+                </a>
+                <a href="{{ url_for('student_mngt') }}" class="nav-link">
+                    <i class="fas fa-user-graduate"></i> Student Management
+                </a>
+                <a href="{{ url_for('attend') }}" class="nav-link">
+                    <i class="fas fa-clipboard-check"></i> Attendance
+                </a>
+                <a href="{{ url_for('logout') }}" class="nav-link" style="color: var(--danger); margin-top: 2rem;">
+                    <i class="fas fa-sign-out-alt"></i> Logout Session
+                </a>
+            </nav>
+            
+            <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;">
+                <div style="font-size: 0.9rem; color: var(--gray); margin-bottom: 10px;">Quick Stats</div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <span class="badge badge-success">Users: {{ users|length }}</span>
+                    <span class="badge badge-info">Active</span>
+                    <span class="badge badge-warning">Online</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card users-table-card" style="flex: 1;">
+            <div class="card-title">
+                <i class="fas fa-list"></i> System Users
+            </div>
+            
+            {% if users %}
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Email Address</th>
+                            <th>Security</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td style="font-weight: 600;">{{ loop.index }}</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 36px; height: 36px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    {{ user.email }}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge badge-info">
+                                    <i class="fas fa-key"></i> Encrypted
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge badge-success">
+                                    <i class="fas fa-circle"></i> Active
+                                </span>
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 8px;">
+                                    <a href="{{ url_for('admin', edit_id=user.id) }}" class="btn btn-light" style="padding: 8px 16px; font-size: 0.9rem;">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url_for('delete_user', user_id=user.id) }}" class="btn btn-danger" style="padding: 8px 16px; font-size: 0.9rem;"
+                                       onclick="return confirm('Delete this user permanently?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 3rem; color: var(--gray);">
+                <i class="fas fa-users-slash" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                <h3>No Users Found</h3>
+                <p>Start by adding your first system user</p>
+            </div>
+            {% endif %}
+        </div>
+        
+    </div>
+    <div class="main-content-below">
+        
+        <div class="stats-grid">
+            <div class="stat-card blue">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-number">{{ users|length }}</div>
+                <div class="stat-label"></div>
+            </div>
+            
+            <div class="stat-card green">
+                <div class="stat-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="stat-number">{% if edit_id %}Edit{% else %}Add{% endif %}</div>
+                <div class="stat-label"></div>
+            </div>
+            
+            <div class="stat-card purple">
+                <div class="stat-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="stat-number"></div>
+                <div class="stat-label"></div>
+            </div>
+            
+            <div class="stat-card orange">
+                <div class="stat-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="stat-number"></div>
+                <div class="stat-label"></div>
+            </div>
+        </div>
+        
+        <div class="card" style="margin-bottom: 2rem;">
+            <div class="card-title">
+                <i class="fas fa-{% if edit_id %}edit{% else %}plus-circle{% endif %}"></i>
+                {{ edit_user.email if edit_id else 'Register New User' }}
+            </div>
+            
+            <form action="{{ url_for('admin') }}" method="POST">
+                <input type="hidden" name="edit_id" value="{{ edit_id if edit_id else '' }}">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" name="email" class="form-control" 
+                               value="{{ edit_user.email if edit_user else '' }}" 
+                               placeholder="admin@campus.edu" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <div style="position: relative;">
+                            <input type="password" name="password" class="form-control" 
+                                   value="{{ edit_user.password if edit_user else '' }}" 
+                                   placeholder="Secure password" required id="password">
+                            <button type="button" onclick="togglePassword()" 
+                                    style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--gray); cursor: pointer;">
+                                <i class="fas fa-eye" id="toggleIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 12px; margin-top: 2rem;">
+                    <a href="{{ url_for('admin') }}" class="btn btn-light" style="flex: 1;">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">
+                        <i class="fas fa-save"></i> {{ 'Update User' if edit_id else 'Create Account' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+    </div>
+    </div>
+
+<script>
+function togglePassword() {
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('toggleIcon');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    }
+}
+</script>
+{% endblock %}
